@@ -10,6 +10,7 @@ public class Player : MonoBehaviour
     private Transform cameraArm;
 
     public float speed;
+    public float Aimspeed;
 
     float hAxis;
     float vAxis;
@@ -31,6 +32,7 @@ public class Player : MonoBehaviour
         LookAround();
         GetInput();
         Move();
+        
     }
 
     void LookAround()
@@ -64,22 +66,28 @@ public class Player : MonoBehaviour
 
         Vector2 moveInput = new Vector2(hAxis,vAxis);
         bool isMove = moveInput.magnitude != 0;
+        bool isAim = Aim > 0;
 
-        if (isMove)
+        Vector3 lookForward = new Vector3(cameraArm.forward.x, 0f, cameraArm.forward.z).normalized;
+        Vector3 lookRight = new Vector3(cameraArm.right.x, 0f, cameraArm.right.z).normalized;
+        Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
+
+        if (isAim)
         {
-            Vector3 lookForward = new Vector3(cameraArm.forward.x, 0f, cameraArm.forward.z).normalized;
-            Vector3 lookRight = new Vector3(cameraArm.right.x, 0f, cameraArm.right.z).normalized;
-            Vector3 moveDir = lookForward * moveInput.y + lookRight * moveInput.x;
-
+            characterBody.forward = lookForward;
+            transform.position += moveDir * Aimspeed * Time.deltaTime;
+        }
+        else if (isMove)
+        {
             characterBody.forward = moveDir;
             transform.position += moveDir * speed * Time.deltaTime;
         }
 
-       
-        animator.SetBool("Aim", Aim > 0);
+        animator.SetBool("Aim", isAim);
 
-        if (Aim > 0)
+        if (isAim)
         {
+
             animator.SetBool("Front", vAxis > 0);
             animator.SetBool("Back", vAxis < 0);
             animator.SetBool("Left", hAxis < 0);
@@ -87,10 +95,12 @@ public class Player : MonoBehaviour
         }
         else
         {
-            animator.SetBool("Idle", moveVec == Vector3.zero);
-            animator.SetBool("Run", moveVec != Vector3.zero);
+            animator.SetBool("Idle", !isMove);
+            animator.SetBool("Run", isMove);
         }
-        
+
+
+
 
     }
 
