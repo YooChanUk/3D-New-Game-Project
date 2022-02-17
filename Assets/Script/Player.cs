@@ -87,7 +87,6 @@ public class Player : MonoBehaviour
 
         if (isAim)
         {
-
             animator.SetBool("Front", vAxis > 0);
             animator.SetBool("Back", vAxis < 0);
             animator.SetBool("Left", hAxis < 0);
